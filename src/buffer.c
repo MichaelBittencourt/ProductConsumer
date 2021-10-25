@@ -20,6 +20,7 @@ buffer createBuffer(int size) {
 #ifndef DISABLE_SEMAPHORE
     buf.bufferFull = createSemaphore(START_POSITION);
     buf.bufferEmpty = createSemaphore(size);
+    buf.semMutex = createSemaphore(1);
 #endif
     return buf;
 }
@@ -27,6 +28,7 @@ buffer createBuffer(int size) {
 void addBuffer(buffer * buf, int number) {
 #ifndef DISABLE_SEMAPHORE
     acquireSemaphore(&(buf->bufferEmpty));
+    acquireSemaphore(&(buf->semMutex));
 #endif
     if (buf->freePosition >= buf->size) {
         fprintf(stderr, "Erro durante a producao!\n");
@@ -39,6 +41,7 @@ void addBuffer(buffer * buf, int number) {
         buf->freePosition++;
     }
 #ifndef DISABLE_SEMAPHORE
+    releaseSemaphore(&(buf->semMutex));
     releaseSemaphore(&(buf->bufferFull));
 #endif
 }
@@ -46,6 +49,7 @@ void addBuffer(buffer * buf, int number) {
 void removeBuffer(buffer * buf) {
 #ifndef DISABLE_SEMAPHORE
     acquireSemaphore(&(buf->bufferFull));
+    acquireSemaphore(&(buf->semMutex));
 #endif
     if(buf->freePosition <= START_POSITION) {
         fprintf(stderr, "Erro durante consumo!\n");
@@ -57,6 +61,7 @@ void removeBuffer(buffer * buf) {
         printf("Consumidor %d removeu buf[%d]: %d\n", tid, buf->freePosition, buf->buf[buf->freePosition]);
     }
 #ifndef DISABLE_SEMAPHORE
+    releaseSemaphore(&(buf->semMutex));
     releaseSemaphore(&(buf->bufferEmpty));
 #endif
 }

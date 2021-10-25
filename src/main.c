@@ -8,23 +8,45 @@
 #include"produtor.h"
 #include"consumidor.h"
 
+#define QTD_PRODUCTORS 3
+#define QTD_CONSUMERS 5
+
 void * startProduct(void * params);
 void * startConsumer(void * params);
 
 int main(void) {
     srand(time(NULL));
     buffer buf = createBuffer(5);
-    produtor p1 = createProdutor(&buf);
-    consumidor c1 = createConsumidor(&buf);
+    
+    produtor productors[QTD_PRODUCTORS];
+    for (int i = 0; i < QTD_PRODUCTORS; i++) {
+        productors[i] = createProdutor(&buf);
+    }
 
-    pthread_t tp1;
-    pthread_t tc1;
+    consumidor consumers[QTD_CONSUMERS];
+    for (int i = 0; i < QTD_CONSUMERS; i++) {
+        consumers[i] = createConsumidor(&buf);
+    }
 
-    pthread_create(&tp1, NULL, startProduct, (void*)(&p1));
-    pthread_create(&tc1, NULL, startConsumer, (void*)(&c1));
+    pthread_t theadsProd[QTD_PRODUCTORS];
+    pthread_t theadsCons[QTD_CONSUMERS];
 
-    pthread_join(tp1, NULL);
-    pthread_join(tc1, NULL);
+    for (int i = 0; i < QTD_PRODUCTORS; i++) {
+        pthread_create(&theadsProd[i], NULL, startProduct, (void*)(&productors[i]));
+    }
+
+    for (int i = 0; i < QTD_CONSUMERS; i++) {
+        pthread_create(&theadsCons[i], NULL, startConsumer, (void*)(&consumers[i]));
+    }
+
+    for (int i = 0; i < QTD_PRODUCTORS; i++) {
+        pthread_join(theadsProd[i], NULL);
+    }
+
+    for (int i = 0; i < QTD_CONSUMERS; i++) {
+        pthread_join(theadsCons[i], NULL);
+    }
+
     return 0;
 }
 

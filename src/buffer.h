@@ -14,6 +14,7 @@ typedef struct buffer {
 #ifndef DISABLE_SEMAPHORE
     semaphore bufferFull;
     semaphore bufferEmpty;
+    semaphore semMutex;
 #endif
 }buffer;
 
