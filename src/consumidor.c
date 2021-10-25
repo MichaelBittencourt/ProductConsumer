@@ -11,7 +11,7 @@ consumidor createConsumidor(buffer * buf) {
 
 void runCons(consumidor * consu) {
     while(1) {
-        sleep((rand() % 100)/10.0);
+        //sleep((rand() % 10)/10.0);
         removeBuffer(consu->buf);
     }
 }

@@ -17,11 +17,14 @@ buffer createBuffer(int size) {
     buf.buf = (int*)malloc(sizeof(int)*size);
     buf.size = size;
     buf.freePosition = START_POSITION;
+    buf.bufferFull = createSemaphore(START_POSITION);
+    buf.bufferEmpty = createSemaphore(size);
     //pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     return buf;
 }
 
 void addBuffer(buffer * buf, int number) {
+    acquireSemaphore(&(buf->bufferEmpty));
     if (buf->freePosition >= buf->size) {
         fprintf(stderr, "Erro durante a producao!\n");
     } else {
@@ -32,9 +35,11 @@ void addBuffer(buffer * buf, int number) {
         printf("Produtor %d inseriu em buf[%d]: %d\n", tid, buf->freePosition, number); 
         buf->freePosition++;
     }
+    releaseSemaphore(&(buf->bufferFull));
 }
 
 void removeBuffer(buffer * buf) {
+    acquireSemaphore(&(buf->bufferFull));
     if(buf->freePosition <= START_POSITION) {
         fprintf(stderr, "Erro durante consumo!\n");
     } else {
@@ -44,4 +49,5 @@ void removeBuffer(buffer * buf) {
         //int tid = -1;
         printf("Consumidor %d removeu buf[%d]: %d\n", tid, buf->freePosition, buf->buf[buf->freePosition]);
     }
+    releaseSemaphore(&(buf->bufferEmpty));
 }

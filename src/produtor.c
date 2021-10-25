@@ -12,8 +12,8 @@ produtor createProdutor(buffer * buf) {
 
 void runProd(produtor * prod) {
     while(1) {
-        int numero = (rand() % 20)/10.0;
-        sleep(numero);
+        int numero = (rand() % 100)/10.0;
+        //sleep(numero);
         addBuffer(prod->buf, numero);
     }
 }

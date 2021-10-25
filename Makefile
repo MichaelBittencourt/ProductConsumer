@@ -9,7 +9,8 @@ BIN=prog
 ########################### COMPILE SETTINGS ##########################
 
 CC=gcc
-FLAGS=-std=c99 -lpthread
+FLAGS:=
+CC_FLAGS=-std=c99 -lpthread $(FLAGS)
 
 ######################### TARGETS #################################
 
@@ -19,10 +20,10 @@ objFolder:
 	@ mkdir -p $(OBJ_FOLDER)
 
 $(BIN): $(OBJ)
-	$(CC) $^ -o $@ $(FLAGS)
+	$(CC) $^ -o $@ $(CC_FLAGS)
 
 $(OBJ_FOLDER)/%.o: $(SRC_FOLDER)/%.c
-	$(CC) -c $< -o $@ $(FLAGS)
+	$(CC) -c $< -o $@ $(CC_FLAGS)
 
 .PHONY: clean all
 
