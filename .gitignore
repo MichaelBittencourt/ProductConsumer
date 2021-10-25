@@ -1,3 +1,5 @@
 *.o
 prog
 obj/
+*.swp
+*.swo
