@@ -8,8 +8,8 @@
 #include"produtor.h"
 #include"consumidor.h"
 
-#define QTD_PRODUCTORS 3
-#define QTD_CONSUMERS 5
+#define QTD_PRODUCTORS 5
+#define QTD_CONSUMERS 10
 
 void * startProduct(void * params);
 void * startConsumer(void * params);

@@ -17,6 +17,7 @@ buffer createBuffer(int size) {
     buf.buf = (int*)malloc(sizeof(int)*size);
     buf.size = size;
     buf.freePosition = START_POSITION;
+    buf.outPosition = START_POSITION;
 #ifndef DISABLE_SEMAPHORE
     buf.bufferFull = createSemaphore(START_POSITION);
     buf.bufferEmpty = createSemaphore(size);
@@ -30,7 +31,7 @@ void addBuffer(buffer * buf, int number) {
     acquireSemaphore(&(buf->bufferEmpty));
     acquireSemaphore(&(buf->semMutex));
 #endif
-    if (buf->freePosition >= buf->size) {
+    if (buf->freePosition >= buf->size || buf->freePosition < START_POSITION) {
         fprintf(stderr, "Erro durante a producao!\n");
     } else {
         buf->buf[buf->freePosition] = number;
@@ -39,6 +40,7 @@ void addBuffer(buffer * buf, int number) {
         //int tid = -1;
         printf("Produtor %d inseriu em buf[%d]: %d\n", tid, buf->freePosition, number); 
         buf->freePosition++;
+        buf->freePosition %= buf->size;
     }
 #ifndef DISABLE_SEMAPHORE
     releaseSemaphore(&(buf->semMutex));
@@ -51,14 +53,15 @@ void removeBuffer(buffer * buf) {
     acquireSemaphore(&(buf->bufferFull));
     acquireSemaphore(&(buf->semMutex));
 #endif
-    if(buf->freePosition <= START_POSITION) {
+    if(buf->outPosition >= buf->size || buf->outPosition < START_POSITION) {
         fprintf(stderr, "Erro durante consumo!\n");
     } else {
-        buf->freePosition--;
         //pid_t tid = syscall(__NR_gettid);
         pid_t tid = gettid();
         //int tid = -1;
-        printf("Consumidor %d removeu buf[%d]: %d\n", tid, buf->freePosition, buf->buf[buf->freePosition]);
+        printf("Consumidor %d removeu buf[%d]: %d\n", tid, buf->outPosition, buf->buf[buf->outPosition]);
+        buf->outPosition++;
+        buf->outPosition %= buf->size;
     }
 #ifndef DISABLE_SEMAPHORE
     releaseSemaphore(&(buf->semMutex));

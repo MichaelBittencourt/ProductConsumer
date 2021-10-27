@@ -11,6 +11,7 @@ typedef struct buffer {
     int * buf;
     int size;
     int freePosition;
+    int outPosition;
 #ifndef DISABLE_SEMAPHORE
     semaphore bufferFull;
     semaphore bufferEmpty;

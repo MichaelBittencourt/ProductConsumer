@@ -25,10 +25,15 @@ $(BIN): $(OBJ)
 $(OBJ_FOLDER)/%.o: $(SRC_FOLDER)/%.c
 	$(CC) -c $< -o $@ $(CC_FLAGS)
 
-.PHONY: clean all
+.PHONY: clean all run
+
+run: all
+	@ echo "Running $(BIN) ..."
+	@ $(shell pwd)/$(BIN)
 
 clean:
 	rm -f *~ $(BIN)
 	test -e $(OBJ_FOLDER) && rm -f $(OBJ_FOLDER)/*.o && rmdir $(OBJ_FOLDER) || true
+
 
 
